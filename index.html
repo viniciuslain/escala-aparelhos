@@ -196,6 +196,13 @@
   .escala-wrap{overflow-x:auto;border:1px solid var(--cinza-borda);border-radius:8px;}
   table.escala-table{width:100%;border-collapse:collapse;font-size:.78rem;min-width:520px;}
   table.escala-table td,table.escala-table th{border:1px solid var(--cinza-borda);padding:6px 5px;text-align:center;white-space:nowrap;}
+  #lista-container table.escala-table{table-layout:fixed;font-size:.72rem;min-width:0;}
+  #lista-container table.escala-table td,#lista-container table.escala-table th{padding:5px 3px;white-space:normal;word-break:break-word;overflow-wrap:anywhere;}
+  #lista-container table.escala-table td:nth-child(1),#lista-container table.escala-table th:nth-child(1){width:15%;}
+  #lista-container table.escala-table td:nth-child(2),#lista-container table.escala-table th:nth-child(2){width:13%;}
+  #lista-container table.escala-table td:nth-child(3),#lista-container table.escala-table th:nth-child(3){width:19%;}
+  #lista-container table.escala-table td:nth-child(4),#lista-container table.escala-table th:nth-child(4){width:27%;}
+  #lista-container table.escala-table td:nth-child(5),#lista-container table.escala-table th:nth-child(5){width:26%;}
   tr.mes-row td{background:var(--azul-esc);color:#fff;font-weight:700;font-size:.78rem;padding:8px 6px;letter-spacing:.02em;}
   tr.col-row th{background:var(--azul);color:#fff;font-weight:700;font-size:.68rem;padding:6px 4px;text-transform:uppercase;}
   tr.linha-dado td{background:#fff;}
@@ -818,7 +825,7 @@
         const [ano, mesNum] = grupo.split("-");
         const mesNome = MESES[parseInt(mesNum,10)-1].toUpperCase();
         html += `<tr class="mes-row"><td colspan="5">${mesNome} ${ano} — LASER/RADIOFREQUÊNCIA</td></tr>`;
-        html += `<tr class="col-row"><th>DATA</th><th>HORÁRIO</th><th>LOCAL</th><th>MÉDICO</th><th>APARELHO / OBS</th></tr>`;
+        html += `<tr class="col-row"><th>DATA</th><th>HORA</th><th>LOCAL</th><th>MÉDICO</th><th>APAR./OBS</th></tr>`;
       }
 
       const st = statusReserva(r);
