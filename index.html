@@ -280,9 +280,6 @@
   footer{
     text-align:center;font-size:.72rem;color:var(--texto-suave);padding:16px;
   }
-  .toolbar{display:flex;gap:8px;margin-bottom:10px;}
-  .toolbar .btn{flex:1;font-size:.78rem;padding:9px;}
-  #importFile{display:none;}
 
   /* toast */
   .toast-wrap{
@@ -380,11 +377,6 @@
   <!-- ABA LISTA -->
   <section id="tab-lista" style="display:none;">
     <div class="card">
-      <div class="toolbar">
-        <button class="btn btn-secondary" id="btn-export">Exportar dados</button>
-        <button class="btn btn-secondary" id="btn-import">Importar dados</button>
-        <input type="file" id="importFile" accept="application/json">
-      </div>
       <div class="filtros">
         <select id="filtro-aparelho">
           <option value="">Todos aparelhos</option>
@@ -423,9 +415,7 @@
   <section id="tab-financeiro" style="display:none;">
     <div class="card">
       <h2>Valor da contribuição por uso</h2>
-      <label>Valor por uso — Laser ou Radiofrequência (R$)</label>
-      <div id="fin-taxa" class="pix-box" style="max-width:160px;">R$ 100</div>
-      <div class="hint">Os dois aparelhos custam o mesmo valor por uso. Valor fixo, definido entre os sócios.</div>
+      <p class="hint" style="font-size:.85rem;">Valor por uso — Laser ou Radiofrequência: <strong id="fin-taxa">R$ 100</strong>, valor fixo, definido entre os sócios. Os dois aparelhos custam o mesmo valor por uso.</p>
     </div>
 
     <div class="card">
@@ -696,6 +686,10 @@
   function tituloMedico(nome){
     return (MEDICAS.includes(nome) ? "Dra. " : "Dr. ") + nome;
   }
+  const HOSPITAL_ABREV = {"Unimed":"HU","Círculo":"COC","Vivi Ramos":"VR","Pompéia":"HP"};
+  function abrevHospital(nome){
+    return HOSPITAL_ABREV[nome] || nome;
+  }
   function fmtHorario(r){
     if(r.horario) return `às ${r.horario}`;
     return "horário não informado";
@@ -842,8 +836,8 @@
       html += `<tr class="linha-dado ${cls}" title="${titulo}">
         <td>${fmtDataCurta(r.data)}</td>
         <td>${r.horario || "-"}</td>
-        <td class="local-cell">${r.hospital}</td>
-        <td class="medico-cell">${tituloMedico(r.medico)}</td>
+        <td class="local-cell">${abrevHospital(r.hospital)}</td>
+        <td class="medico-cell">${r.medico}</td>
         <td class="obs-cell">${obsTxt || "-"}<button class="del-btn-sm" data-id="${r.id}" title="Excluir reserva">✕</button></td>
       </tr>`;
     });
@@ -872,48 +866,6 @@
     });
   }
 
-  // ---------- exportar / importar ----------
-  document.getElementById("btn-export").addEventListener("click", function(){
-    const blob = new Blob([JSON.stringify(reservas,null,2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "escala_aparelhos_backup.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-  document.getElementById("btn-import").addEventListener("click", function(){
-    document.getElementById("importFile").click();
-  });
-  document.getElementById("importFile").addEventListener("change", function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(evt){
-      try{
-        const importados = JSON.parse(evt.target.result);
-        if(!Array.isArray(importados)) throw new Error("formato invalido");
-        // mescla evitando duplicar por id
-        const idsExistentes = new Set(reservas.map(r=>r.id));
-        let adicionados = 0;
-        importados.forEach(r=>{
-          if(r && r.id && !idsExistentes.has(r.id)){
-            reservas.push(r);
-            idsExistentes.add(r.id);
-            adicionados++;
-          }
-        });
-        saveData(reservas);
-        renderLista();
-        renderCalendario();
-        toast(`${adicionados} reserva(s) importada(s).`);
-      }catch(err){
-        toast("Arquivo inválido.", "erro");
-      }
-      e.target.value = "";
-    };
-    reader.readAsText(file);
-  });
 
   // ---------- calendario ----------
   let calAno, calMes; // mes 0-11
