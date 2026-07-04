@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cirurgia Termoablativa — Laser & Radiofrequência</title>
+<style>
+  :root{
+    --azul:#1d5b8f;
+    --azul-esc:#123a5c;
+    --azul-cl:#eaf2fa;
+    --verde:#2e8b57;
+    --verde-cl:#e5f5ec;
+    --vermelho:#c0392b;
+    --vermelho-cl:#fdecea;
+    --laranja:#c77d10;
+    --laranja-cl:#fdf1e0;
+    --cinza:#f4f5f7;
+    --cinza-borda:#dde1e6;
+    --texto:#26313d;
+    --texto-suave:#657486;
+  }
+  *{box-sizing:border-box;}
+  *:focus-visible{outline:2px solid var(--azul);outline-offset:2px;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--cinza);
+    color:var(--texto);
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:linear-gradient(135deg,var(--azul-esc),var(--azul));
+    color:#fff;
+    padding:20px 16px 16px;
+    box-shadow:0 2px 10px rgba(18,58,92,.18);
+    position:relative;
+    z-index:6;
+  }
+  header h1{margin:0;font-size:1.3rem;font-weight:700;letter-spacing:-.01em;}
+  header p{margin:4px 0 0;font-size:.82rem;opacity:.88;}
+  .status-sync{font-size:.72rem !important;opacity:.75 !important;margin-top:6px !important;}
+  .status-sync.erro{color:#ffd9d4;opacity:1 !important;}
+  .status-sync.ok{color:#d9f7e6;opacity:1 !important;}
+  .tabs{
+    display:flex;
+    gap:6px;
+    padding:10px 12px 0;
+    background:#fff;
+    border-bottom:1px solid var(--cinza-borda);
+    position:sticky;top:0;z-index:5;
+  }
+  .tab-btn{
+    flex:1;
+    padding:10px 8px;
+    border:none;
+    background:none;
+    font-size:.85rem;
+    font-weight:600;
+    color:var(--texto-suave);
+    border-bottom:3px solid transparent;
+    cursor:pointer;
+    border-radius:6px 6px 0 0;
+    transition:color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .tab-btn:hover{color:var(--azul-esc);background:var(--azul-cl);}
+  .tab-btn.active{color:var(--azul);border-bottom-color:var(--azul);}
+  main{max-width:760px;margin:0 auto;padding:14px 12px 60px;}
+  .card{
+    background:#fff;
+    border:1px solid var(--cinza-borda);
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:0 1px 3px rgba(20,30,40,.05);
+  }
+  .card h2{margin:0 0 12px;font-size:1rem;color:var(--azul-esc);}
+  label{display:block;font-size:.78rem;font-weight:600;color:var(--texto-suave);margin:10px 0 4px;}
+  select,input[type=date],input[type=time],input[type=text],textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--cinza-borda);
+    border-radius:8px;
+    font-size:.92rem;
+    background:#fff;
+    color:var(--texto);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  select:hover,input:hover,textarea:hover{border-color:#c3cad3;}
+  select:focus,input:focus,textarea:focus{
+    outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(29,91,143,.14);
+  }
+  textarea{resize:vertical;min-height:50px;}
+  .row2{display:flex;gap:10px;}
+  .row2 > div{flex:1;}
+  .btn{
+    display:inline-block;
+    padding:11px 16px;
+    border-radius:8px;
+    border:none;
+    font-size:.9rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:filter .15s ease, transform .05s ease, box-shadow .15s ease;
+  }
+  .btn:hover{filter:brightness(1.06);}
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--azul);color:#fff;width:100%;margin-top:14px;box-shadow:0 2px 6px rgba(29,91,143,.25);}
+  .btn-primary:hover{box-shadow:0 3px 10px rgba(29,91,143,.32);}
+  .btn-secondary{background:var(--azul-cl);color:var(--azul-esc);}
+  .btn-secondary:hover{background:#dcebf7;}
+  .btn-ghost{background:none;border:1px solid var(--cinza-borda);color:var(--texto-suave);}
+  .btn-ghost:hover{background:var(--cinza);border-color:#c3cad3;}
+  .btn-danger{background:var(--vermelho-cl);color:var(--vermelho);}
+  .hint{font-size:.75rem;color:var(--texto-suave);margin-top:4px;}
+  .badge{
+    display:inline-block;
+    font-size:.68rem;
+    font-weight:700;
+    padding:2px 7px;
+    border-radius:20px;
+    margin-right:4px;
+  }
+  .badge-laser{background:var(--azul-cl);color:var(--azul);}
+  .badge-rf{background:var(--verde-cl);color:var(--verde);}
+  .badge-ambos{background:#f0e6fa;color:#6b3fa0;}
+
+  /* filtros */
+  .filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .filtros select{width:auto;flex:1;min-width:120px;}
+
+  /* lista */
+  .item{
+    border:1px solid var(--cinza-borda);
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+    position:relative;
+    transition:box-shadow .15s ease;
+  }
+  .item:hover{box-shadow:0 1px 4px rgba(20,30,40,.08);}
+  .item.conflito{border-color:var(--vermelho);background:var(--vermelho-cl);}
+  .item.parcial{border-color:var(--laranja);background:var(--laranja-cl);}
+  .item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .item-data{font-weight:700;font-size:.92rem;}
+  .item-sub{font-size:.8rem;color:var(--texto-suave);margin-top:2px;}
+  .item-tag{font-size:.7rem;font-weight:700;color:var(--vermelho);margin-top:6px;}
+  .item-tag.laranja{color:var(--laranja);}
+  .del-btn{
+    background:none;border:none;color:var(--texto-suave);font-size:1.1rem;cursor:pointer;padding:2px 6px;
+    border-radius:6px;transition:background .15s ease,color .15s ease;
+  }
+  .del-btn:hover{background:var(--vermelho-cl);color:var(--vermelho);}
+  .empty{text-align:center;color:var(--texto-suave);font-size:.85rem;padding:30px 10px;}
+
+  /* painel em formato de planilha */
+  .legenda-tabela{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:.72rem;color:var(--texto-suave);}
+  .legenda-tabela span{display:inline-flex;align-items:center;gap:4px;}
+  .legenda-dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+  .escala-wrap{overflow-x:auto;border:1px solid var(--cinza-borda);border-radius:8px;}
+  table.escala-table{width:100%;border-collapse:collapse;font-size:.78rem;min-width:520px;}
+  table.escala-table td,table.escala-table th{border:1px solid var(--cinza-borda);padding:6px 5px;text-align:center;white-space:nowrap;}
+  tr.mes-row td{background:var(--azul-esc);color:#fff;font-weight:700;font-size:.78rem;padding:8px 6px;letter-spacing:.02em;}
+  tr.col-row th{background:var(--azul);color:#fff;font-weight:700;font-size:.68rem;padding:6px 4px;text-transform:uppercase;}
+  tr.linha-dado td{background:#fff;}
+  tr.linha-dado:nth-child(even) td{background:#fbfcfd;}
+  tr.conflito td{background:var(--vermelho-cl)!important;color:var(--vermelho);font-weight:700;}
+  tr.parcial td{background:var(--laranja-cl)!important;color:var(--laranja);font-weight:600;}
+  td.local-cell,td.medico-cell{text-align:left;white-space:normal;}
+  td.medico-cell{text-transform:uppercase;font-weight:600;}
+  td.obs-cell{position:relative;}
+  .del-btn-sm{background:none;border:none;color:inherit;opacity:.55;cursor:pointer;font-size:.85rem;padding:0 0 0 4px;vertical-align:middle;transition:opacity .15s ease;}
+  .del-btn-sm:hover{opacity:1;}
+  tr.linha-dado{transition:background .15s ease;}
+  tr.linha-dado:hover td{background:var(--azul-cl)!important;}
+
+  /* calendario */
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-header button{background:var(--azul-cl);border:none;color:var(--azul-esc);border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;}
+  .cal-header h3{margin:0;font-size:1rem;text-transform:capitalize;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-dow{text-align:center;font-size:.68rem;font-weight:700;color:var(--texto-suave);padding:4px 0;}
+  .cal-day{
+    aspect-ratio:1/1;
+    border-radius:8px;
+    border:1px solid var(--cinza-borda);
+    padding:4px 3px;
+    font-size:.72rem;
+    background:#fff;
+    display:flex;flex-direction:column;align-items:center;
+    cursor:pointer;
+    position:relative;
+    transition:box-shadow .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .cal-day:not(.off):hover{box-shadow:0 1px 5px rgba(20,30,40,.12);border-color:var(--azul);}
+  .cal-day.off{visibility:hidden;}
+  .cal-day.conflito{border-color:var(--vermelho);background:var(--vermelho-cl);}
+  .cal-day.hoje{border-color:var(--azul);border-width:2px;}
+  .cal-day.hoje .num{color:var(--azul);}
+  .cal-day .num{font-weight:700;margin-bottom:2px;}
+  .cal-day .dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;}
+  .dot{width:7px;height:7px;border-radius:50%;}
+  .dot-laser{background:var(--azul);}
+  .dot-rf{background:var(--verde);}
+
+  /* modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,30,40,.5);
+    display:flex;align-items:flex-end;justify-content:center;z-index:50;
+    animation:fadeIn .15s ease;
+  }
+  .modal{
+    background:#fff;border-radius:16px 16px 0 0;
+    padding:18px;width:100%;max-width:760px;max-height:82vh;overflow:auto;
+    box-shadow:0 -8px 30px rgba(20,30,40,.2);
+    animation:slideUp .2s ease;
+  }
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes slideUp{from{transform:translateY(24px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
+  @media (min-width:600px){
+    .overlay{align-items:center;}
+    .modal{border-radius:16px;animation:popIn .18s ease;}
+  }
+  @keyframes popIn{from{transform:scale(.96);opacity:.6;}to{transform:scale(1);opacity:1;}}
+  .modal h3{margin-top:0;font-size:1rem;}
+  .msg-box{
+    background:var(--cinza);border:1px solid var(--cinza-borda);border-radius:8px;
+    padding:10px;font-size:.85rem;white-space:pre-wrap;margin:10px 0;
+  }
+  .modal-actions{display:flex;gap:8px;margin-top:12px;}
+  .modal-actions .btn{flex:1;}
+  footer{
+    text-align:center;font-size:.72rem;color:var(--texto-suave);padding:16px;
+  }
+  .toolbar{display:flex;gap:8px;margin-bottom:10px;}
+  .toolbar .btn{flex:1;font-size:.78rem;padding:9px;}
+  #importFile{display:none;}
+
+  /* toast */
+  .toast-wrap{
+    position:fixed;left:0;right:0;bottom:18px;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    z-index:100;pointer-events:none;padding:0 16px;
+  }
+  .toast{
+    background:var(--azul-esc);color:#fff;font-size:.82rem;font-weight:600;
+    padding:11px 18px;border-radius:30px;box-shadow:0 4px 16px rgba(18,58,92,.3);
+    max-width:400px;text-align:center;
+    animation:toastIn .2s ease, toastOut .2s ease 2.6s forwards;
+  }
+  .toast.erro{background:var(--vermelho);}
+  @keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes toastOut{from{opacity:1;}to{opacity:0;}}
+
+  /* financeiro */
+  tr.total-row td{background:var(--azul-esc);color:#fff;font-weight:700;}
+  td.pago-cell{white-space:nowrap;}
+  .pago-check{width:18px;height:18px;cursor:pointer;}
+  .pix-box{
+    background:var(--azul-cl);border:1px dashed var(--azul);border-radius:8px;
+    padding:12px;font-size:1rem;font-weight:700;color:var(--azul-esc);
+    text-align:center;letter-spacing:.02em;margin:10px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Cirurgia Termoablativa</h1>
+  <p>Laser & Radiofrequência — reserva compartilhada entre os sócios</p>
+  <p id="status-sync" class="status-sync">Conectando...</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="reservar">Reservar</button>
+  <button class="tab-btn" data-tab="lista">Painel</button>
+  <button class="tab-btn" data-tab="calendario">Calendário</button>
+  <button class="tab-btn" data-tab="financeiro">Financeiro</button>
+</div>
+
+<main>
+
+  <!-- ABA RESERVAR -->
+  <section id="tab-reservar">
+    <div class="card">
+      <h2>Nova reserva</h2>
+      <form id="form-reserva">
+        <label>Médico(a)</label>
+        <select id="f-medico" required></select>
+
+        <label>Aparelho</label>
+        <select id="f-aparelho" required></select>
+        <div class="hint" id="aviso-aparelho"></div>
+
+        <label>Hospital</label>
+        <select id="f-hospital" required></select>
+
+        <label>Data</label>
+        <input type="date" id="f-data" required>
+
+        <label>Horário da cirurgia (opcional, mas recomendado)</label>
+        <input type="time" id="f-horario">
+        <div class="hint">Informar o horário permite liberar o mesmo dia para outro médico, desde que o horário seja diferente.</div>
+
+        <label>Observações (opcional)</label>
+        <textarea id="f-obs" placeholder="Ex: cirurgia às 14h, procedimento X..."></textarea>
+
+        <button type="submit" class="btn btn-primary">Salvar reserva</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ABA LISTA -->
+  <section id="tab-lista" style="display:none;">
+    <div class="card">
+      <div class="toolbar">
+        <button class="btn btn-secondary" id="btn-export">Exportar dados</button>
+        <button class="btn btn-secondary" id="btn-import">Importar dados</button>
+        <input type="file" id="importFile" accept="application/json">
+      </div>
+      <div class="filtros">
+        <select id="filtro-aparelho">
+          <option value="">Todos aparelhos</option>
+        </select>
+        <select id="filtro-hospital">
+          <option value="">Todos hospitais</option>
+        </select>
+        <select id="filtro-periodo">
+          <option value="futuros">Somente futuros</option>
+          <option value="todos">Todos (histórico incluso)</option>
+        </select>
+      </div>
+      <div id="lista-container"></div>
+    </div>
+  </section>
+
+  <!-- ABA CALENDARIO -->
+  <section id="tab-calendario" style="display:none;">
+    <div class="card">
+      <div class="cal-header">
+        <button id="cal-prev">‹</button>
+        <h3 id="cal-titulo"></h3>
+        <button id="cal-next">›</button>
+      </div>
+      <div style="margin-bottom:8px;">
+        <span class="badge badge-laser">● Laser</span>
+        <span class="badge badge-rf">● Radiofrequência</span>
+        <span class="badge" style="background:var(--vermelho-cl);color:var(--vermelho);">■ Conflito</span>
+      </div>
+      <div class="cal-grid" id="cal-dow"></div>
+      <div class="cal-grid" id="cal-grid" style="margin-top:4px;"></div>
+    </div>
+  </section>
+
+  <!-- ABA FINANCEIRO -->
+  <section id="tab-financeiro" style="display:none;">
+    <div class="card">
+      <h2>Valor da contribuição por uso</h2>
+      <label>Valor atual por uso — Laser ou Radiofrequência (R$)</label>
+      <input type="number" id="fin-taxa" min="0" step="1" style="max-width:160px;">
+      <div class="hint">Os dois aparelhos custam o mesmo valor por uso. Se o valor combinado entre os sócios mudar, atualize aqui — o cálculo abaixo se ajusta sozinho.</div>
+    </div>
+
+    <div class="card">
+      <div class="cal-header">
+        <button id="fin-prev">‹</button>
+        <h3 id="fin-titulo"></h3>
+        <button id="fin-next">›</button>
+      </div>
+      <div class="hint" style="margin-bottom:8px;">Acerto feito de 6 em 6 meses. Marque "pago" conforme cada sócio for acertando.</div>
+      <div id="fin-container"></div>
+    </div>
+
+    <div class="card">
+      <h2>Chave Pix para pagamento</h2>
+      <div class="pix-box" id="fin-pix">54996543041</div>
+      <button class="btn btn-secondary" id="fin-pix-copiar">Copiar chave Pix</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Fase 1 — dados salvos localmente neste navegador/celular. Use "Exportar/Importar" para compartilhar entre aparelhos até publicarmos a versão on-line.
+</footer>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- Modal conflito -->
+<div class="overlay" id="modal-conflito" style="display:none;">
+  <div class="modal">
+    <h3>⚠️ Possível conflito de agenda</h3>
+    <p id="modal-conflito-texto" style="font-size:.88rem;"></p>
+    <div class="msg-box" id="modal-conflito-msg"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-conflito-fechar">Fechar</button>
+      <button class="btn btn-secondary" id="modal-conflito-copiar">Copiar mensagem</button>
+    </div>
+    <button class="btn btn-primary" id="modal-conflito-confirmar">Salvar mesmo assim</button>
+  </div>
+</div>
+
+<!-- Modal dia (calendario) -->
+<div class="overlay" id="modal-dia" style="display:none;">
+  <div class="modal">
+    <h3 id="modal-dia-titulo"></h3>
+    <div id="modal-dia-lista"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-dia-fechar">Fechar</button>
+      <button class="btn btn-primary" id="modal-dia-reservar">Reservar este dia</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const MEDICOS = ["Vinicius Lain","Felipe Zoppas","Herton Lopes","Marcos Ruzzarin","Roberto Heck","Rubens Guelfi","Francine Ruzzarin","Carolina Guelfi","Rubens Fernandes","Gilberto Crippa","Valter Postalli"];
+  const HOSPITAIS = ["Unimed","Círculo","Pompéia","Vivi Ramos","Outro"];
+  const APARELHOS = ["Laser","Radiofrequência"];
+  const SOMENTE_LASER = ["Rubens Fernandes"];
+
+  const STORAGE_KEY = "escala_aparelhos_v1";
+  const API_URL = "https://script.google.com/macros/s/AKfycbz-XiyV8rrenBDrUiM9mox9s67PPDD4wIyqzm29zGM7v-hGh-_74pCNUHeyD-IrAvKXKg/exec";
+
+  // Dados reais da escala de julho/agosto 2026, usados como carga inicial
+  // (só entram na primeira vez que o app roda neste navegador; depois disso
+  // o que estiver salvo localmente manda).
+  const SEED_RESERVAS = [
+    {id:"seed1",  data:"2026-07-03", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
+    {id:"seed2",  data:"2026-07-10", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Vinicius Lain",   horario:"07:30", obs:""},
+    {id:"seed3",  data:"2026-07-15", aparelho:"Laser",           hospital:"Círculo",   medico:"Herton Lopes",    horario:"07:30", obs:""},
+    {id:"seed4",  data:"2026-07-17", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Vinicius Lain",   horario:"07:30", obs:""},
+    {id:"seed5",  data:"2026-07-20", aparelho:"Laser",           hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
+    {id:"seed6",  data:"2026-07-22", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"07:30", obs:""},
+    {id:"seed7",  data:"2026-07-22", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
+    {id:"seed8",  data:"2026-07-22", aparelho:"Radiofrequência", hospital:"Vivi Ramos",medico:"Rubens Guelfi",   horario:"13:00", obs:""},
+    {id:"seed9",  data:"2026-07-24", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Herton Lopes",    horario:"08:30", obs:""},
+    {id:"seed10", data:"2026-08-07", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
+    {id:"seed11", data:"2026-08-14", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"07:30", obs:""},
+    {id:"seed12", data:"2026-08-21", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Carolina Guelfi", horario:"09:00", obs:""},
+    {id:"seed13", data:"2026-08-24", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Vinicius Lain",   horario:"07:30", obs:""},
+  ];
+
+  function loadData(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw === null){
+      // primeira vez neste navegador: carrega a escala já existente
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_RESERVAS));
+      return SEED_RESERVAS.slice();
+    }
+    try{
+      return JSON.parse(raw) || [];
+    }catch(e){ return []; }
+  }
+  function saveData(data){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+  let reservas = loadData(); // cache local: usado enquanto a planilha compartilhada carrega/se estiver offline
+  let online = false;
+  const statusEl = document.getElementById("status-sync");
+
+  function setStatus(msg, cls){
+    if(!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className = "status-sync" + (cls ? " "+cls : "");
+  }
+
+  async function apiGet(action, params){
+    const url = new URL(API_URL);
+    url.searchParams.set("action", action);
+    if(params) Object.keys(params).forEach(k=> url.searchParams.set(k, params[k]));
+    const res = await fetch(url.toString());
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    return res.json();
+  }
+  async function apiPost(body){
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(body)
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    return res.json();
+  }
+
+  async function sincronizar(mostrarToast){
+    try{
+      const resp = await apiGet("list");
+      if(resp && resp.ok){
+        reservas = resp.reservas || [];
+        saveData(reservas);
+        online = true;
+        setStatus("Sincronizado com a planilha compartilhada", "ok");
+        renderLista();
+        renderCalendario();
+        renderFinanceiro();
+        if(mostrarToast) toast("Escala atualizada.");
+        return true;
+      }
+    }catch(e){
+      online = false;
+      setStatus("Sem conexão — mostrando dados salvos neste navegador", "erro");
+    }
+    return false;
+  }
+
+  function uid(){ return 'r' + Date.now() + Math.floor(Math.random()*1000); }
+
+  function toast(msg, tipo){
+    const wrap = document.getElementById("toast-wrap");
+    const el = document.createElement("div");
+    el.className = "toast" + (tipo==="erro" ? " erro" : "");
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(()=> el.remove(), 3000);
+  }
+
+  function aparelhosPara(medico){
+    if(SOMENTE_LASER.includes(medico)) return ["Laser"];
+    return APARELHOS;
+  }
+
+  // ---------- popula selects fixos ----------
+  function fillSelect(sel, options, placeholder){
+    sel.innerHTML = "";
+    if(placeholder){
+      const o = document.createElement("option");
+      o.value=""; o.textContent = placeholder;
+      sel.appendChild(o);
+    }
+    options.forEach(v=>{
+      const o = document.createElement("option");
+      o.value=v; o.textContent=v;
+      sel.appendChild(o);
+    });
+  }
+
+  const fMedico = document.getElementById("f-medico");
+  const fAparelho = document.getElementById("f-aparelho");
+  const fHospital = document.getElementById("f-hospital");
+  const fData = document.getElementById("f-data");
+  const fHorario = document.getElementById("f-horario");
+  const fObs = document.getElementById("f-obs");
+  const avisoAparelho = document.getElementById("aviso-aparelho");
+
+  fillSelect(fMedico, MEDICOS, "Selecione o médico");
+  fillSelect(fHospital, HOSPITAIS, "Selecione o hospital");
+
+  function atualizaAparelhosDisponiveis(){
+    const opts = aparelhosPara(fMedico.value);
+    fillSelect(fAparelho, opts, opts.length>1 ? "Selecione o aparelho" : null);
+    if(SOMENTE_LASER.includes(fMedico.value)){
+      avisoAparelho.textContent = "Este médico utiliza somente o Laser.";
+    } else {
+      avisoAparelho.textContent = "";
+    }
+  }
+  fMedico.addEventListener("change", atualizaAparelhosDisponiveis);
+  atualizaAparelhosDisponiveis();
+
+  // data minima = hoje
+  const hojeISO = new Date().toISOString().slice(0,10);
+  fData.min = hojeISO;
+  fData.value = hojeISO;
+
+  // ---------- abas ----------
+  const tabs = document.querySelectorAll(".tab-btn");
+  const secoes = {
+    reservar: document.getElementById("tab-reservar"),
+    lista: document.getElementById("tab-lista"),
+    calendario: document.getElementById("tab-calendario"),
+    financeiro: document.getElementById("tab-financeiro"),
+  };
+  tabs.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      tabs.forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      Object.keys(secoes).forEach(k=> secoes[k].style.display = (k===btn.dataset.tab)?"":"none");
+      if(btn.dataset.tab==="lista") renderLista();
+      if(btn.dataset.tab==="calendario") renderCalendario();
+      if(btn.dataset.tab==="financeiro") renderFinanceiro();
+    });
+  });
+
+  // ---------- logica de conflito ----------
+  // compara o horario de duas reservas do mesmo dia+aparelho:
+  // true  = mesmo horário (conflito confirmado)
+  // false = horários diferentes (compatível, sem conflito)
+  // null  = pelo menos um dos dois não tem horário informado (indefinido)
+  function mesmoHorario(a,b){
+    if(!a.horario || !b.horario) return null;
+    return a.horario === b.horario;
+  }
+
+  // retorna lista de reservas do mesmo dia+aparelho (excluindo a propria, se ignoreId for passado)
+  function reservasConflitantes(data, aparelho, ignoreId){
+    return reservas.filter(r => r.data===data && r.aparelho===aparelho && r.id!==ignoreId);
+  }
+
+  // classifica o "grupo" de uma reserva especifica em relacao as outras do mesmo dia/aparelho
+  // retorna: 'ok' | 'parcial' (falta horário para confirmar) | 'conflito' (mesmo horário ou nenhum horário informado)
+  function statusReserva(r){
+    const outras = reservasConflitantes(r.data, r.aparelho, r.id);
+    if(outras.length===0) return {status:"ok", outras:[]};
+    let temConfirmado = false;
+    let temIndefinido = false;
+    outras.forEach(o=>{
+      const igual = mesmoHorario(r,o);
+      if(igual===true) temConfirmado = true;
+      if(igual===null) temIndefinido = true;
+    });
+    if(temConfirmado) return {status:"conflito", outras};
+    if(temIndefinido) return {status:"parcial", outras};
+    return {status:"ok", outras};
+  }
+
+  function fmtData(iso){
+    const [y,m,d] = iso.split("-");
+    return `${d}/${m}/${y}`;
+  }
+  const MES_ABREV = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  function fmtDataCurta(iso){
+    const [y,m,d] = iso.split("-");
+    return `${d}/${MES_ABREV[parseInt(m,10)-1]}`;
+  }
+  const MEDICAS = ["Francine Ruzzarin","Carolina Guelfi"];
+  function tituloMedico(nome){
+    return (MEDICAS.includes(nome) ? "Dra. " : "Dr. ") + nome;
+  }
+  function fmtHorario(r){
+    if(r.horario) return `às ${r.horario}`;
+    return "horário não informado";
+  }
+
+  function gerarMensagem(nova, existente){
+    return `⚠️ Aviso de agenda — ${nova.aparelho}\n`+
+    `Dia ${fmtData(nova.data)}, o aparelho de ${nova.aparelho} já está reservado por ${existente.medico} no Hospital ${existente.hospital} (${fmtHorario(existente)}).\n`+
+    `${nova.medico} também precisa do aparelho nesse dia, para o Hospital ${nova.hospital} (${fmtHorario(nova)}).\n`+
+    `Podem combinar horários ou ajustar a data?`;
+  }
+
+  // ---------- formulario ----------
+  const form = document.getElementById("form-reserva");
+  let pendente = null; // reserva aguardando confirmacao apos aviso de conflito
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    if(!fMedico.value || !fAparelho.value || !fHospital.value || !fData.value){
+      alert("Preencha médico, aparelho, hospital e data.");
+      return;
+    }
+    const nova = {
+      id: uid(),
+      medico: fMedico.value,
+      aparelho: fAparelho.value,
+      hospital: fHospital.value,
+      data: fData.value,
+      horario: fHorario.value || "",
+      obs: fObs.value.trim(),
+    };
+
+    const conflitantes = reservasConflitantes(nova.data, nova.aparelho, null);
+    if(conflitantes.length>0){
+      // verifica se ao menos uma delas gera conflito real/indefinido
+      let algumProblema = false;
+      let exemploConflito = conflitantes[0];
+      conflitantes.forEach(o=>{
+        const igual = mesmoHorario(nova,o);
+        if(igual!==false) { algumProblema = true; exemploConflito = o; }
+      });
+      if(algumProblema){
+        pendente = nova;
+        document.getElementById("modal-conflito-texto").textContent =
+          `Já existe reserva do ${nova.aparelho} no dia ${fmtData(nova.data)} para ${exemploConflito.medico} (${exemploConflito.hospital}, ${fmtHorario(exemploConflito)}).`;
+        document.getElementById("modal-conflito-msg").textContent = gerarMensagem(nova, exemploConflito);
+        document.getElementById("modal-conflito").style.display = "flex";
+        return;
+      }
+    }
+    confirmarSalvar(nova);
+  });
+
+  function confirmarSalvar(nova){
+    reservas.push(nova);
+    saveData(reservas);
+    form.reset();
+    fData.value = hojeISO;
+    atualizaAparelhosDisponiveis();
+    toast("Reserva salva!");
+    renderLista();
+    renderCalendario();
+    apiPost({action:"create", reserva: nova}).then(resp=>{
+      if(!resp || !resp.ok){
+        toast("Aviso: não sincronizou com a planilha compartilhada.", "erro");
+      }
+    }).catch(()=>{
+      toast("Sem conexão com a planilha — reserva salva só neste navegador.", "erro");
+    });
+  }
+
+  document.getElementById("modal-conflito-confirmar").addEventListener("click", function(){
+    if(pendente){ confirmarSalvar(pendente); pendente=null; }
+    document.getElementById("modal-conflito").style.display="none";
+  });
+  document.getElementById("modal-conflito-fechar").addEventListener("click", function(){
+    pendente = null;
+    document.getElementById("modal-conflito").style.display="none";
+  });
+  document.getElementById("modal-conflito-copiar").addEventListener("click", function(){
+    const texto = document.getElementById("modal-conflito-msg").textContent;
+    navigator.clipboard && navigator.clipboard.writeText(texto).then(()=>{
+      toast("Mensagem copiada! Cole no WhatsApp para avisar o outro médico.");
+    }).catch(()=>{
+      toast("Não foi possível copiar automaticamente. Selecione o texto manualmente.", "erro");
+    });
+  });
+
+  // ---------- painel/lista ----------
+  const filtroAparelho = document.getElementById("filtro-aparelho");
+  const filtroHospital = document.getElementById("filtro-hospital");
+  const filtroPeriodo = document.getElementById("filtro-periodo");
+  fillSelect(filtroAparelho, APARELHOS, "Todos aparelhos");
+  fillSelect(filtroHospital, HOSPITAIS, "Todos hospitais");
+  [filtroAparelho, filtroHospital, filtroPeriodo].forEach(el=> el.addEventListener("change", renderLista));
+
+  function renderLista(){
+    const cont = document.getElementById("lista-container");
+    let itens = reservas.slice();
+
+    if(filtroAparelho.value) itens = itens.filter(r=>r.aparelho===filtroAparelho.value);
+    if(filtroHospital.value) itens = itens.filter(r=>r.hospital===filtroHospital.value);
+    if(filtroPeriodo.value==="futuros") itens = itens.filter(r=> r.data >= hojeISO);
+
+    itens.sort((a,b)=>{
+      if(a.data!==b.data) return a.data<b.data?-1:1;
+      const ai = a.horario||"99:99", bi = b.horario||"99:99";
+      return ai<bi?-1:(ai>bi?1:0);
+    });
+
+    if(itens.length===0){
+      cont.innerHTML = '<div class="empty">Nenhuma reserva encontrada.</div>';
+      return;
+    }
+
+    let html = `<div class="legenda-tabela">
+      <span><span class="legenda-dot" style="background:var(--vermelho-cl);border:1px solid var(--vermelho);"></span>Conflito (mesmo horário ou sem horário)</span>
+      <span><span class="legenda-dot" style="background:var(--laranja-cl);border:1px solid var(--laranja);"></span>Falta confirmar horário</span>
+    </div>`;
+    html += '<div class="escala-wrap"><table class="escala-table"><tbody>';
+
+    let grupoAtual = null;
+    itens.forEach(r=>{
+      const grupo = r.data.slice(0,7); // AAAA-MM
+      if(grupo !== grupoAtual){
+        grupoAtual = grupo;
+        const [ano, mesNum] = grupo.split("-");
+        const mesNome = MESES[parseInt(mesNum,10)-1].toUpperCase();
+        html += `<tr class="mes-row"><td colspan="5">${mesNome} ${ano} — LASER/RADIOFREQUÊNCIA</td></tr>`;
+        html += `<tr class="col-row"><th>DATA</th><th>HORÁRIO</th><th>LOCAL</th><th>MÉDICO</th><th>OBS</th></tr>`;
+      }
+
+      const st = statusReserva(r);
+      const cls = st.status==="conflito" ? "conflito" : (st.status==="parcial" ? "parcial" : "");
+      const obsBase = r.aparelho==="Radiofrequência" ? "RF" : "";
+      const obsTxt = obsBase + (r.obs ? (obsBase ? " · " : "") + r.obs : "");
+      let titulo = "";
+      if(st.status==="conflito"){
+        titulo = `Conflito: mesmo aparelho já reservado neste dia (${st.outras.map(o=>o.medico).join(", ")})`;
+      } else if(st.status==="parcial"){
+        titulo = `Falta confirmar horário: outro médico também reservou este dia (${st.outras.map(o=>o.medico).join(", ")})`;
+      }
+
+      html += `<tr class="linha-dado ${cls}" title="${titulo}">
+        <td>${fmtDataCurta(r.data)}</td>
+        <td>${r.horario || "-"}</td>
+        <td class="local-cell">${r.hospital}</td>
+        <td class="medico-cell">${tituloMedico(r.medico)}</td>
+        <td class="obs-cell">${obsTxt || "-"}<button class="del-btn-sm" data-id="${r.id}" title="Excluir reserva">✕</button></td>
+      </tr>`;
+    });
+
+    html += "</tbody></table></div>";
+    cont.innerHTML = html;
+
+    cont.querySelectorAll(".del-btn-sm").forEach(btn=>{
+      btn.addEventListener("click", function(e){
+        e.stopPropagation();
+        if(confirm("Excluir esta reserva?")){
+          const idExcluir = btn.dataset.id;
+          reservas = reservas.filter(r=>r.id!==idExcluir);
+          saveData(reservas);
+          renderLista();
+          renderCalendario();
+          apiPost({action:"delete", id: idExcluir}).then(resp=>{
+            if(!resp || !resp.ok){
+              toast("Aviso: não sincronizou a exclusão com a planilha.", "erro");
+            }
+          }).catch(()=>{
+            toast("Sem conexão — exclusão salva só neste navegador.", "erro");
+          });
+        }
+      });
+    });
+  }
+
+  // ---------- exportar / importar ----------
+  document.getElementById("btn-export").addEventListener("click", function(){
+    const blob = new Blob([JSON.stringify(reservas,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "escala_aparelhos_backup.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+  document.getElementById("btn-import").addEventListener("click", function(){
+    document.getElementById("importFile").click();
+  });
+  document.getElementById("importFile").addEventListener("change", function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      try{
+        const importados = JSON.parse(evt.target.result);
+        if(!Array.isArray(importados)) throw new Error("formato invalido");
+        // mescla evitando duplicar por id
+        const idsExistentes = new Set(reservas.map(r=>r.id));
+        let adicionados = 0;
+        importados.forEach(r=>{
+          if(r && r.id && !idsExistentes.has(r.id)){
+            reservas.push(r);
+            idsExistentes.add(r.id);
+            adicionados++;
+          }
+        });
+        saveData(reservas);
+        renderLista();
+        renderCalendario();
+        toast(`${adicionados} reserva(s) importada(s).`);
+      }catch(err){
+        toast("Arquivo inválido.", "erro");
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  });
+
+  // ---------- calendario ----------
+  let calAno, calMes; // mes 0-11
+  const hoje = new Date();
+  calAno = hoje.getFullYear();
+  calMes = hoje.getMonth();
+
+  const DOW = ["dom","seg","ter","qua","qui","sex","sáb"];
+  const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+
+  document.getElementById("cal-dow").innerHTML = DOW.map(d=>`<div class="cal-dow">${d}</div>`).join("");
+
+  document.getElementById("cal-prev").addEventListener("click", function(){
+    calMes--; if(calMes<0){ calMes=11; calAno--; }
+    renderCalendario();
+  });
+  document.getElementById("cal-next").addEventListener("click", function(){
+    calMes++; if(calMes>11){ calMes=0; calAno++; }
+    renderCalendario();
+  });
+
+  function isoDia(ano,mes,dia){
+    const m = String(mes+1).padStart(2,"0");
+    const d = String(dia).padStart(2,"0");
+    return `${ano}-${m}-${d}`;
+  }
+
+  function renderCalendario(){
+    document.getElementById("cal-titulo").textContent = `${MESES[calMes]} de ${calAno}`;
+    const grid = document.getElementById("cal-grid");
+    const primeiroDia = new Date(calAno, calMes, 1).getDay();
+    const totalDias = new Date(calAno, calMes+1, 0).getDate();
+
+    let html = "";
+    for(let i=0;i<primeiroDia;i++){ html += `<div class="cal-day off"></div>`; }
+
+    for(let d=1; d<=totalDias; d++){
+      const iso = isoDia(calAno, calMes, d);
+      const doDia = reservas.filter(r=>r.data===iso);
+      const temLaser = doDia.some(r=>r.aparelho==="Laser");
+      const temRF = doDia.some(r=>r.aparelho==="Radiofrequência");
+      const temConflito = doDia.some(r=> statusReserva(r).status==="conflito");
+      let dots = "";
+      if(temLaser) dots += `<span class="dot dot-laser"></span>`;
+      if(temRF) dots += `<span class="dot dot-rf"></span>`;
+      const ehHoje = iso === hojeISO;
+      html += `<div class="cal-day ${temConflito?'conflito':''} ${ehHoje?'hoje':''}" data-iso="${iso}">
+        <div class="num">${d}</div>
+        <div class="dots">${dots}</div>
+      </div>`;
+    }
+    grid.innerHTML = html;
+
+    grid.querySelectorAll(".cal-day:not(.off)").forEach(el=>{
+      el.addEventListener("click", function(){ abrirModalDia(el.dataset.iso); });
+    });
+  }
+
+  function abrirModalDia(iso){
+    const doDia = reservas.filter(r=>r.data===iso).sort((a,b)=>{
+      const ai=a.horario||"99:99", bi=b.horario||"99:99";
+      return ai<bi?-1:(ai>bi?1:0);
+    });
+    document.getElementById("modal-dia-titulo").textContent = fmtData(iso);
+    const cont = document.getElementById("modal-dia-lista");
+    if(doDia.length===0){
+      cont.innerHTML = '<div class="empty">Nenhuma reserva neste dia.</div>';
+    } else {
+      cont.innerHTML = doDia.map(r=>{
+        const st = statusReserva(r);
+        const cls = st.status==="conflito" ? "conflito" : (st.status==="parcial" ? "parcial" : "");
+        const badgeCls = r.aparelho==="Laser" ? "badge-laser" : "badge-rf";
+        return `<div class="item ${cls}">
+          <div class="item-data"><span class="badge ${badgeCls}">${r.aparelho}</span></div>
+          <div class="item-sub">${r.medico} — Hospital ${r.hospital} — ${fmtHorario(r)}</div>
+          ${r.obs ? `<div class="item-sub">${r.obs}</div>` : ""}
+        </div>`;
+      }).join("");
+    }
+    document.getElementById("modal-dia-reservar").onclick = function(){
+      document.getElementById("modal-dia").style.display="none";
+      tabs.forEach(b=>b.classList.remove("active"));
+      document.querySelector('.tab-btn[data-tab="reservar"]').classList.add("active");
+      Object.keys(secoes).forEach(k=> secoes[k].style.display = (k==="reservar")?"":"none");
+      fData.value = iso;
+    };
+    document.getElementById("modal-dia").style.display="flex";
+  }
+  document.getElementById("modal-dia-fechar").addEventListener("click", function(){
+    document.getElementById("modal-dia").style.display="none";
+  });
+
+  // ---------- financeiro ----------
+  const TAXA_KEY = "taxa_uso_v1";
+  const PAGAMENTOS_KEY = "pagamentos_v1";
+
+  function loadTaxa(){
+    const raw = localStorage.getItem(TAXA_KEY);
+    const n = raw !== null ? parseFloat(raw) : 100;
+    return isNaN(n) ? 100 : n;
+  }
+  function saveTaxa(v){ localStorage.setItem(TAXA_KEY, String(v)); }
+
+  function loadPagamentos(){
+    try{ return JSON.parse(localStorage.getItem(PAGAMENTOS_KEY)) || {}; }catch(e){ return {}; }
+  }
+  function savePagamentos(obj){ localStorage.setItem(PAGAMENTOS_KEY, JSON.stringify(obj)); }
+
+  let pagamentos = loadPagamentos();
+
+  const finTaxaInput = document.getElementById("fin-taxa");
+  finTaxaInput.value = loadTaxa();
+  finTaxaInput.addEventListener("change", function(){
+    let v = parseFloat(finTaxaInput.value);
+    if(isNaN(v) || v < 0) v = 100;
+    finTaxaInput.value = v;
+    saveTaxa(v);
+    renderFinanceiro();
+  });
+
+  // semestre atual: 1 = jan-jun, 2 = jul-dez
+  let finAno = hoje.getFullYear();
+  let finSemestre = hoje.getMonth() < 6 ? 1 : 2;
+
+  function mesesDoSemestre(ano, semestre){
+    const inicio = semestre === 1 ? 0 : 6;
+    const meses = [];
+    for(let i=0;i<6;i++){ meses.push({ano, mes: inicio+i}); }
+    return meses;
+  }
+
+  document.getElementById("fin-prev").addEventListener("click", function(){
+    if(finSemestre === 1){ finSemestre = 2; finAno -= 1; } else { finSemestre = 1; }
+    renderFinanceiro();
+  });
+  document.getElementById("fin-next").addEventListener("click", function(){
+    if(finSemestre === 2){ finSemestre = 1; finAno += 1; } else { finSemestre = 2; }
+    renderFinanceiro();
+  });
+
+  function chavePagamento(ano, semestre, medico){
+    return `${ano}-S${semestre}|${medico}`;
+  }
+  function fmtReal(v){
+    return "R$ " + v.toFixed(2).replace(".", ",");
+  }
+
+  function renderFinanceiro(){
+    const meses = mesesDoSemestre(finAno, finSemestre);
+    document.getElementById("fin-titulo").textContent =
+      `${finSemestre}º semestre de ${finAno} (${MESES[meses[0].mes].slice(0,3)}–${MESES[meses[5].mes].slice(0,3)})`;
+
+    // agrupa reservas por medico dentro do semestre selecionado
+    const porMedico = {};
+    reservas.forEach(r=>{
+      const [y,m] = r.data.split("-").map(Number);
+      const mesIdx = m - 1;
+      const posicao = meses.findIndex(mo => mo.ano===y && mo.mes===mesIdx);
+      if(posicao === -1) return;
+      if(!porMedico[r.medico]) porMedico[r.medico] = { aparelhos: new Set(), porMes: meses.map(()=>0) };
+      porMedico[r.medico].porMes[posicao] += 1;
+      porMedico[r.medico].aparelhos.add(r.aparelho);
+    });
+
+    const taxa = loadTaxa();
+    const medicosComUso = Object.keys(porMedico).sort();
+    const cont = document.getElementById("fin-container");
+
+    if(medicosComUso.length === 0){
+      cont.innerHTML = '<div class="empty">Nenhum uso registrado neste semestre.</div>';
+      return;
+    }
+
+    let html = '<div class="escala-wrap"><table class="escala-table"><tbody>';
+    html += `<tr class="col-row"><th>MÉDICO</th><th>APARELHO</th>${meses.map(mo=>`<th>${MESES[mo.mes].slice(0,3).toUpperCase()}</th>`).join("")}<th>TOTAL USOS</th><th>VALOR (R$)</th><th>PAGO</th></tr>`;
+
+    let totalGeral = 0;
+    let usosGeral = 0;
+    medicosComUso.forEach(medico=>{
+      const info = porMedico[medico];
+      const totalUsos = info.porMes.reduce((a,b)=>a+b,0);
+      const valor = totalUsos * taxa;
+      totalGeral += valor;
+      usosGeral += totalUsos;
+      const tiposAparelho = Array.from(info.aparelhos);
+      const aparelhoLabel = tiposAparelho.length > 1 ? "Ambos" : tiposAparelho[0];
+      const badgeCls = aparelhoLabel==="Laser" ? "badge-laser" : (aparelhoLabel==="Radiofrequência" ? "badge-rf" : "badge-ambos");
+      const chave = chavePagamento(finAno, finSemestre, medico);
+      const pago = !!pagamentos[chave];
+
+      html += `<tr class="linha-dado">
+        <td class="medico-cell">${tituloMedico(medico)}</td>
+        <td><span class="badge ${badgeCls}">${aparelhoLabel}</span></td>
+        ${info.porMes.map(c=>`<td>${c || "-"}</td>`).join("")}
+        <td>${totalUsos}</td>
+        <td>${fmtReal(valor)}</td>
+        <td class="pago-cell"><input type="checkbox" class="pago-check" data-chave="${chave}" ${pago?"checked":""}></td>
+      </tr>`;
+    });
+
+    html += `<tr class="total-row"><td colspan="${2+meses.length}">TOTAL GERAL</td><td>${usosGeral}</td><td>${fmtReal(totalGeral)}</td><td></td></tr>`;
+    html += "</tbody></table></div>";
+    cont.innerHTML = html;
+
+    cont.querySelectorAll(".pago-check").forEach(chk=>{
+      chk.addEventListener("change", function(){
+        pagamentos[chk.dataset.chave] = chk.checked;
+        savePagamentos(pagamentos);
+        toast(chk.checked ? "Marcado como pago." : "Marcado como não pago.");
+      });
+    });
+  }
+
+  document.getElementById("fin-pix-copiar").addEventListener("click", function(){
+    const chave = document.getElementById("fin-pix").textContent.trim();
+    navigator.clipboard && navigator.clipboard.writeText(chave).then(()=>{
+      toast("Chave Pix copiada!");
+    }).catch(()=>{
+      toast("Não foi possível copiar. Selecione manualmente.", "erro");
+    });
+  });
+
+  // inicializa (mostra cache local na hora, depois sincroniza com a planilha)
+  renderLista();
+  renderCalendario();
+  renderFinanceiro();
+  sincronizar();
+  setInterval(function(){ sincronizar(true); }, 30000);
+
+})();
+</script>
+</body>
+</html>
