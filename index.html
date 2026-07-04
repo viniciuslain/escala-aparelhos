@@ -356,9 +356,9 @@
   <section id="tab-financeiro" style="display:none;">
     <div class="card">
       <h2>Valor da contribuição por uso</h2>
-      <label>Valor atual por uso — Laser ou Radiofrequência (R$)</label>
-      <input type="number" id="fin-taxa" min="0" step="1" style="max-width:160px;">
-      <div class="hint">Os dois aparelhos custam o mesmo valor por uso. Se o valor combinado entre os sócios mudar, atualize aqui — o cálculo abaixo se ajusta sozinho.</div>
+      <label>Valor por uso — Laser ou Radiofrequência (R$)</label>
+      <div id="fin-taxa" class="pix-box" style="max-width:160px;">R$ 100</div>
+      <div class="hint">Os dois aparelhos custam o mesmo valor por uso. Valor fixo, definido entre os sócios.</div>
     </div>
 
     <div class="card">
@@ -940,15 +940,12 @@
   });
 
   // ---------- financeiro ----------
-  const TAXA_KEY = "taxa_uso_v1";
   const PAGAMENTOS_KEY = "pagamentos_v1";
+  const TAXA_FIXA = 100; // valor fixo por uso (Laser ou Radiofrequência) — não editável no app
 
   function loadTaxa(){
-    const raw = localStorage.getItem(TAXA_KEY);
-    const n = raw !== null ? parseFloat(raw) : 100;
-    return isNaN(n) ? 100 : n;
+    return TAXA_FIXA;
   }
-  function saveTaxa(v){ localStorage.setItem(TAXA_KEY, String(v)); }
 
   function loadPagamentos(){
     try{ return JSON.parse(localStorage.getItem(PAGAMENTOS_KEY)) || {}; }catch(e){ return {}; }
@@ -957,15 +954,7 @@
 
   let pagamentos = loadPagamentos();
 
-  const finTaxaInput = document.getElementById("fin-taxa");
-  finTaxaInput.value = loadTaxa();
-  finTaxaInput.addEventListener("change", function(){
-    let v = parseFloat(finTaxaInput.value);
-    if(isNaN(v) || v < 0) v = 100;
-    finTaxaInput.value = v;
-    saveTaxa(v);
-    renderFinanceiro();
-  });
+  document.getElementById("fin-taxa").textContent = "R$ " + TAXA_FIXA;
 
   // semestre atual: 1 = jan-jun, 2 = jul-dez
   let finAno = hoje.getFullYear();
