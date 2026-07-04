@@ -217,10 +217,10 @@
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
   .cal-dow{text-align:center;font-size:.68rem;font-weight:700;color:var(--texto-suave);padding:4px 0;}
   .cal-day{
-    aspect-ratio:1/1;
+    min-height:56px;
     border-radius:8px;
     border:1px solid var(--cinza-borda);
-    padding:4px 3px;
+    padding:4px 2px;
     font-size:.72rem;
     background:#fff;
     display:flex;flex-direction:column;align-items:center;
@@ -234,10 +234,15 @@
   .cal-day.hoje{border-color:var(--azul);border-width:2px;}
   .cal-day.hoje .num{color:var(--azul);}
   .cal-day .num{font-weight:700;margin-bottom:2px;}
-  .cal-day .dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;}
-  .dot{width:7px;height:7px;border-radius:50%;}
-  .dot-laser{background:var(--azul);}
-  .dot-rf{background:var(--verde);}
+  .cal-day .dots{display:flex;flex-direction:column;gap:2px;align-items:stretch;width:100%;}
+  .cal-tag{
+    font-size:.52rem;font-weight:700;line-height:1.3;
+    padding:1px 2px;border-radius:5px;text-align:center;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .cal-tag-laser{background:var(--azul-cl);color:var(--azul-esc);}
+  .cal-tag-rf{background:var(--verde-cl);color:var(--verde);}
+  .cal-modal-resumo{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
 
   /* modal */
   .overlay{
@@ -471,8 +476,8 @@
 (function(){
   "use strict";
 
-  const MEDICOS = ["Vinicius Lain","Felipe Zoppas","Herton Lopes","Marcos Ruzzarin","Roberto Heck","Rubens Guelfi","Francine Ruzzarin","Carolina Guelfi","Rubens Fernandes","Gilberto Crippa","Valter Postalli"];
-  const HOSPITAIS = ["Unimed","Círculo","Pompéia","Vivi Ramos","Outro"];
+  const MEDICOS = ["Carolina Guelfi","Felipe Zoppas","Francine Ruzzarin","Gilberto Crippa","Herton Lopes","Leila Moeko","Marcos Ruzzarin","Roberto Heck","Rubens Fernandes","Rubens Guelfi","Valter Postalli","Vinicius Lain"];
+  const HOSPITAIS = ["Círculo","Outro","Pompéia","Unimed","Vivi Ramos"];
   const APARELHOS = ["Laser","Radiofrequência"];
   const SOMENTE_LASER = ["Rubens Fernandes"];
 
@@ -485,9 +490,9 @@
   const SEED_RESERVAS = [
     {id:"seed1",  data:"2026-07-03", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
     {id:"seed2",  data:"2026-07-10", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Vinicius Lain",   horario:"07:30", obs:""},
-    {id:"seed3",  data:"2026-07-15", aparelho:"Laser",           hospital:"Círculo",   medico:"Herton Lopes",    horario:"07:30", obs:""},
+    {id:"seed3",  data:"2026-07-15", aparelho:"Radiofrequência", hospital:"Círculo",   medico:"Herton Lopes",    horario:"07:30", obs:""},
     {id:"seed4",  data:"2026-07-17", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Vinicius Lain",   horario:"07:30", obs:""},
-    {id:"seed5",  data:"2026-07-20", aparelho:"Laser",           hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
+    {id:"seed5",  data:"2026-07-20", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
     {id:"seed6",  data:"2026-07-22", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"07:30", obs:""},
     {id:"seed7",  data:"2026-07-22", aparelho:"Radiofrequência", hospital:"Unimed",    medico:"Felipe Zoppas",   horario:"08:30", obs:""},
     {id:"seed8",  data:"2026-07-22", aparelho:"Radiofrequência", hospital:"Vivi Ramos",medico:"Rubens Guelfi",   horario:"13:00", obs:""},
@@ -680,7 +685,7 @@
     const [y,m,d] = iso.split("-");
     return `${d}/${MES_ABREV[parseInt(m,10)-1]}`;
   }
-  const MEDICAS = ["Francine Ruzzarin","Carolina Guelfi"];
+  const MEDICAS = ["Francine Ruzzarin","Carolina Guelfi","Leila Moeko"];
   function tituloMedico(nome){
     return (MEDICAS.includes(nome) ? "Dra. " : "Dr. ") + nome;
   }
@@ -813,13 +818,13 @@
         const [ano, mesNum] = grupo.split("-");
         const mesNome = MESES[parseInt(mesNum,10)-1].toUpperCase();
         html += `<tr class="mes-row"><td colspan="5">${mesNome} ${ano} — LASER/RADIOFREQUÊNCIA</td></tr>`;
-        html += `<tr class="col-row"><th>DATA</th><th>HORÁRIO</th><th>LOCAL</th><th>MÉDICO</th><th>OBS</th></tr>`;
+        html += `<tr class="col-row"><th>DATA</th><th>HORÁRIO</th><th>LOCAL</th><th>MÉDICO</th><th>APARELHO / OBS</th></tr>`;
       }
 
       const st = statusReserva(r);
       const cls = st.status==="conflito" ? "conflito" : (st.status==="parcial" ? "parcial" : "");
-      const obsBase = r.aparelho==="Radiofrequência" ? "RF" : "";
-      const obsTxt = obsBase + (r.obs ? (obsBase ? " · " : "") + r.obs : "");
+      const obsBase = r.aparelho==="Radiofrequência" ? "RF" : "Laser";
+      const obsTxt = obsBase + (r.obs ? " · " + r.obs : "");
       let titulo = "";
       if(st.status==="conflito"){
         titulo = `Conflito: mesmo aparelho já reservado neste dia (${st.outras.map(o=>o.medico).join(", ")})`;
@@ -944,13 +949,13 @@
       const temLaser = doDia.some(r=>r.aparelho==="Laser");
       const temRF = doDia.some(r=>r.aparelho==="Radiofrequência");
       const temConflito = doDia.some(r=> statusReserva(r).status==="conflito");
-      let dots = "";
-      if(temLaser) dots += `<span class="dot dot-laser"></span>`;
-      if(temRF) dots += `<span class="dot dot-rf"></span>`;
+      let tags = "";
+      if(temLaser) tags += `<span class="cal-tag cal-tag-laser">Laser</span>`;
+      if(temRF) tags += `<span class="cal-tag cal-tag-rf">RF</span>`;
       const ehHoje = iso === hojeISO;
       html += `<div class="cal-day ${temConflito?'conflito':''} ${ehHoje?'hoje':''}" data-iso="${iso}">
         <div class="num">${d}</div>
-        <div class="dots">${dots}</div>
+        <div class="dots">${tags}</div>
       </div>`;
     }
     grid.innerHTML = html;
@@ -970,7 +975,13 @@
     if(doDia.length===0){
       cont.innerHTML = '<div class="empty">Nenhuma reserva neste dia.</div>';
     } else {
-      cont.innerHTML = doDia.map(r=>{
+      const temLaser = doDia.some(r=>r.aparelho==="Laser");
+      const temRF = doDia.some(r=>r.aparelho==="Radiofrequência");
+      let resumo = '<div class="cal-modal-resumo">';
+      if(temLaser) resumo += '<span class="cal-tag cal-tag-laser" style="font-size:.75rem;padding:4px 10px;">Laser Ocupado</span>';
+      if(temRF) resumo += '<span class="cal-tag cal-tag-rf" style="font-size:.75rem;padding:4px 10px;">RF Ocupada</span>';
+      resumo += '</div>';
+      cont.innerHTML = resumo + doDia.map(r=>{
         const st = statusReserva(r);
         const cls = st.status==="conflito" ? "conflito" : (st.status==="parcial" ? "parcial" : "");
         const badgeCls = r.aparelho==="Laser" ? "badge-laser" : "badge-rf";
@@ -1118,10 +1129,9 @@
   renderCalendario();
   renderFinanceiro();
   sincronizar();
-  setInterval(function(){ sincronizar(true); }, 30000);
+  setInterval(function(){ sincronizar(true); }, 8000);
 
 })();
 </script>
 </body>
 </html>
-<!-- rebuild 1783125243 -->
